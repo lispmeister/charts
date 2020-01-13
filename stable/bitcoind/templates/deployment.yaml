@@ -25,7 +25,7 @@ spec:
       initContainers:
         - name: copy-bitcoind-config
           image: busybox
-          command: ['sh', '-c', 'cp /configmap/bitcoin.conf /bitcoin/.bitcoin/bitcoin.conf']
+          command: ['sh', '-c', 'cp /configmap/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf']
           volumeMounts:
             - name: configmap
               mountPath: /configmap
@@ -49,10 +49,10 @@ spec:
               containerPort: {{ .Values.service.testnetP2pPort }}
           volumeMounts:
             - name: data
-              mountPath: /bitcoin
+              mountPath: /home/bitcoin
             {{- if .Values.configurationFile }}
             - name: config
-              mountPath: /bitcoin/.bitcoin/bitcoin.conf
+              mountPath: /home/bitcoin/.bitcoin/bitcoin.conf
               subPath: bitcoin.conf
             {{- end }}
       volumes:

@@ -30,7 +30,7 @@ spec:
             - name: configmap
               mountPath: /configmap
             - name: config
-              mountPath: /bitcoin/.bitcoin/
+              mountPath: /home/bitcoin/.bitcoin/
       {{- end }}
       containers:
         - name: {{ template "bitcoind.fullname" . }}

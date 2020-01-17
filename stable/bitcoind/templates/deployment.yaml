@@ -27,7 +27,7 @@ spec:
           image: busybox
           command: ['sh', '-c', 'cp /configmap/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf']
           volumeMounts:
-            - name: configmap
+            - name: configmap-bitcoin-core
               mountPath: /configmap
             - name: bitcoin-core-config
               mountPath: /home/bitcoin/.bitcoin/
@@ -37,7 +37,7 @@ spec:
           image: busybox
           command: ['sh', '-c', 'cp /configmap/lnd.conf /home/bitcoin/.lnd/lnd.conf']
           volumeMounts:
-            - name: configmap
+            - name: configmap-lnd
               mountPath: /configmap
             - name: lnd-config
               mountPath: /home/bitcoin/.lnd/

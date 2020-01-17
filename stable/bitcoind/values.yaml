@@ -59,7 +59,7 @@ lseed:
   tag: latest
   pullPolicy: IfNotPresent
   service:
-    lseedPort: 53
+    lseedDNS: 53
   resources: 
     requests:
       memory: 1024Mi

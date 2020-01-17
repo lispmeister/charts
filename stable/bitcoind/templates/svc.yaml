@@ -9,16 +9,12 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   ports:
-    - name: rpc
-      port: {{ .Values.bitcoin-core.service.rpcPort }}
-      targetPort: rpc
-    - name: p2p
+    - name: bitcoin-core-p2p
       port: {{ .Values.bitcoin-core.service.p2pPort }}
-      targetPort: p2p
-    - name: testnet
-      port: {{ .Values.bitcoin-core.service.testnetPort }}
-    - name: testnet-p2p
-      port: {{ .Values.bitcoin-core.service.testnetP2pPort }}
+    - name: lnd-p2p
+      port: {{ .Values.bitcoin-core.service.p2pPort }}
+    - name: lseedDNS
+      port: {{ .Values.bitcoin-core.service.lseedDNS }}
   selector:
     app: {{ template "bitcoind.name" . }}
     release: {{ .Release.Name }}

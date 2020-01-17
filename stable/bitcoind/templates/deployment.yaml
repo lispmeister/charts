@@ -22,14 +22,14 @@ spec:
     spec:
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       initContainers:
-      {{- if .Values.bitcoin-core.configurationFile }}
+      {{- if .Values.bitcoind.configurationFile }}
         - name: copy-bitcoind-config
           image: busybox
           command: ['sh', '-c', 'cp /configmap/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf']
           volumeMounts:
-            - name: configmap-bitcoin-core
+            - name: configmap-bitcoind
               mountPath: /configmap
-            - name: bitcoin-core-config
+            - name: bitcoind-config
               mountPath: /home/bitcoin/.bitcoin/
       {{- end }}
       {{- if .Values.lnd.configurationFile }}
@@ -45,18 +45,18 @@ spec:
       
       containers:
         - name: {{ template "bitcoind.fullname" . }}
-          image: "{{ .Values.bitcoin-core.repository }}:{{ .Values.bitcoin-core.tag }}"
-          imagePullPolicy: {{ .Values.bitcoin-core.pullPolicy | quote }}
+          image: "{{ .Values.bitcoind.repository }}:{{ .Values.bitcoind.tag }}"
+          imagePullPolicy: {{ .Values.bitcoind.pullPolicy | quote }}
           resources:
-{{ toYaml .Values.bitcoin-core.resources | indent 12 }}
+{{ toYaml .Values.bitcoind.resources | indent 12 }}
           ports:
-            - name: p2p
-              containerPort: {{ .Values.bitcoin-core.service.p2pPort }}
+            - name: bitcoind-p2p
+              containerPort: {{ .Values.bitcoind.service.p2pPort }}
           volumeMounts:
             - name: data
               mountPath: /home/bitcoin
-            {{- if .Values.bitcoin-core.configurationFile }}
-            - name: bitcoin-core-config
+            {{- if .Values.bitcoind.configurationFile }}
+            - name: bitcoind-config
               mountPath: /home/bitcoin/.bitcoin/bitcoin.conf
               subPath: bitcoin.conf
             {{- end }}
@@ -67,7 +67,7 @@ spec:
           resources:
 {{ toYaml .Values.lnd.resources | indent 12 }}
           ports:
-            - name: p2p
+            - name: lnd-p2p
               containerPort: {{ .Values.lnd.service.p2pPort }}
           volumeMounts:
             - name: data
@@ -81,11 +81,22 @@ spec:
         - name: {{ template "bitcoind.fullname" . }}
           image: "{{ .Values.lseed.repository }}:{{ .Values.lseed.tag }}"
           imagePullPolicy: {{ .Values.lseed.pullPolicy | quote }}
+          command: ["lseed"]
+          args: ["--listen", {{ .Values.lseed.args.listen }},
+          "--test-lnd-node", {{ .Values.lseed.args.test-lnd.node }},
+          "--test-tls-path", {{ .Values.lseed.args.test-tls.path }},
+          "--test-mac-path", {{ .Values.lseed.args.test-mac-path }},
+          "--root-domain", {{ .Values.lseed.args.root-domain }},
+          "--root-ip", {{ .Values.lseed.args.root-ip }},
+          "--poll-interval", {{ .Values.lseed.args.poll-interval }},
+          "--debug", {{ .Values.lseed.args.debug}},
+          "--results", {{ .Values.lseed.args.results }} ]
+          
           resources:
 {{ toYaml .Values.lseed.resources | indent 12 }}
           ports:
-            - name: p2p
-              containerPort: {{ .Values.lseed.service.lseedPort }}
+            - name: lseedDNS
+              containerPort: {{ .Values.lseed.service.lseedDNS }}
           volumeMounts:
             - name: data
               mountPath: /home/bitcoin

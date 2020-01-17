@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 terminationGracePeriodSeconds: 30
-bitcoin-core:
+bitcoind:
   repository: 923662548032.dkr.ecr.eu-west-1.amazonaws.com/lightninglabs/bitcoin-core
   tag: latest
   pullPolicy: IfNotPresent
@@ -64,7 +64,7 @@ lseed:
     requests:
       memory: 1024Mi
       cpu: 1000m
-  commandlineParameters:
+  args:
     listen: 0.0.0.0:53
     test-lnd-node: localhost:10009
     test-tls-path: /home/bitcoin/.lseed/tls.cert

@@ -64,17 +64,16 @@ lseed:
     requests:
       memory: 1024Mi
       cpu: 1000m
-  configurationFile:
-    lseed.conf: |-
-      listen=0.0.0.0:53
-      test-lnd-node=localhost:10009
-      test-tls-path=/tls.cert
-      test-mac-path=/readonly.macaroon
-      root-domain=nodes.lightning.directory
-      root-ip=(pod.ip)
-      poll-interval=10
-      debug=true
-      results=25 
+  commandlineParameters:
+    listen: 0.0.0.0:53
+    test-lnd-node: localhost:10009
+    test-tls-path: /home/bitcoin/.lseed/tls.cert
+    test-mac-path: /home/bitcoin/.lseed/readonly.macaroon
+    root-domain: nodes.lightning.directory
+    root-ip: (pod.ip)
+    poll-interval: 10
+    debug: true
+    results: 25 
 
   
 persistence:

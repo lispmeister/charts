@@ -10,15 +10,15 @@ metadata:
 spec:
   ports:
     - name: rpc
-      port: {{ .Values.service.rpcPort }}
+      port: {{ .Values.bitcoin-core.service.rpcPort }}
       targetPort: rpc
     - name: p2p
-      port: {{ .Values.service.p2pPort }}
+      port: {{ .Values.bitcoin-core.service.p2pPort }}
       targetPort: p2p
     - name: testnet
-      port: {{ .Values.service.testnetPort }}
+      port: {{ .Values.bitcoin-core.service.testnetPort }}
     - name: testnet-p2p
-      port: {{ .Values.service.testnetP2pPort }}
+      port: {{ .Values.bitcoin-core.service.testnetP2pPort }}
   selector:
     app: {{ template "bitcoind.name" . }}
     release: {{ .Release.Name }}

@@ -2,18 +2,80 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 terminationGracePeriodSeconds: 30
-image:
+bitcoin-core:
   repository: 923662548032.dkr.ecr.eu-west-1.amazonaws.com/lightninglabs/bitcoin-core
   tag: latest
   pullPolicy: IfNotPresent
+  service:
+    p2pPort: 18333
+    resources: 
+  requests:
+    memory: 1024Mi
+    cpu: 1000m
+  configurationFile:
+    bitcoin.conf: |-
+      testnet=1
+      server=1
+      printtoconsole=1
+      txindex=1
+      disablewallet=1
+      [test]
+      zmqpubrawblock=tcp://127.0.0.1:28332
+      zmqpubrawtx=tcp://127.0.0.1:28333
+      rpcport=18332
+      rpcbind=127.0.0.1
+      rpcuser=lightning
+      rpcpassword=lightning
 
-service:
-  rpcPort: 8332
-  p2pPort: 8333
-  testnetPort: 18332
-  testnetP2pPort: 18333
-  zmqpubrawblock: 28332
-  zmqpubrawtx: 28333
+lnd:
+  repository: 923662548032.dkr.ecr.eu-west-1.amazonaws.com/lightninglabs/lnd
+  tag: latest
+  pullPolicy: IfNotPresent
+  service:
+    p2pPort: 9735
+  resources: 
+    requests:
+      memory: 1024Mi
+      cpu: 1000m
+  configurationFile:
+    lnd.conf: |-
+      listen=0.0.0.0:9735
+      rpclisten=localhost:10009
+      restlisten=localhost:8080
+      debuglevel=debug
+      [Bitcoin]
+      bitcoin.active=true
+      bitcoin.testnet=true
+      bitcoin.node=bitcoind
+      [Bitcoind]
+      bitcoind.rpchost=localhost
+      bitcoind.rpcuser=lightning
+      bitcoind.rpcpass=lightning
+      bitcoind.zmqpubrawblock=tcp://localhost:28332
+      bitcoind.zmqpubrawtx=tcp://localhost:28333
+
+lseed:
+  repository: 923662548032.dkr.ecr.eu-west-1.amazonaws.com/lightninglabs/lseed
+  tag: latest
+  pullPolicy: IfNotPresent
+  service:
+    lseedPort: 53
+  resources: 
+    requests:
+      memory: 1024Mi
+      cpu: 1000m
+  configurationFile:
+    lseed.conf: |-
+      listen=0.0.0.0:53
+      test-lnd-node=localhost:10009
+      test-tls-path=/tls.cert
+      test-mac-path=/readonly.macaroon
+      root-domain=nodes.lightning.directory
+      root-ip=(pod.ip)
+      poll-interval=10
+      debug=true
+      results=25 
+
   
 persistence:
   enabled: true
@@ -31,24 +93,4 @@ persistence:
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: 
-  requests:
-    memory: 1024Mi
-    cpu: 1000m
 
-# Custom bitcoind configuration file used to override default bitcoind settings
-configurationFile:
-  bitcoin.conf: |-
-    testnet=1
-    server=1
-    printtoconsole=1
-    txindex=1
-    disablewallet=1
-    [test]
-    zmqpubrawblock=tcp://0.0.0.0:28332
-    zmqpubrawtx=tcp://0.0.0.0:28333
-    rpcport=18332
-    rpcbind=0.0.0.0
-    rpcallowip=::/0
-    rpcuser=lightning
-    rpcpassword=lightning

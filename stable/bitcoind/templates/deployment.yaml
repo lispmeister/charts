@@ -77,16 +77,17 @@ spec:
         - name: {{ template "bitcoind.fullname" . }}
           image: "{{ .Values.lseed.repository }}:{{ .Values.lseed.tag }}"
           imagePullPolicy: {{ .Values.lseed.pullPolicy | quote }}
-          # command: ["lseed"]
-          # args: ["--listen", {{ .Values.lseed.args.listen }},
-          # "--test-lnd-node", {{ .Values.lseed.args.testLndNode }},
-          # "--test-tls-path", {{ .Values.lseed.args.tesTtlsPath }},
-          # "--test-mac-path", {{ .Values.lseed.args.testMacPath }},
-          # "--root-domain", {{ .Values.lseed.args.rootDomain }},
-          # "--root-ip", {{ .Values.lseed.args.rootIP }},
-          # "--poll-interval", {{ .Values.lseed.args.pollInterval }},
-          # "--debug", {{ .Values.lseed.args.debug}},
-          # "--results", {{ .Values.lseed.args.results }} ]
+          command: ["lseed"]
+          args:
+            - ["--listen", "{{ .Values.lseed.args.listen }}",
+              "--test-lnd-node", "{{ .Values.lseed.args.testLndNode }}",
+              "--test-tls-path", "{{ .Values.lseed.args.tesTtlsPath }}",
+              "--test-mac-path", "{{ .Values.lseed.args.testMacPath }}",
+              "--root-domain", "{{ .Values.lseed.args.rootDomain }}",
+              "--root-ip", "{{ .Values.lseed.args.rootIP }}",
+              "--poll-interval", "{{ .Values.lseed.args.pollInterval }}",
+              "--debug", "{{ .Values.lseed.args.debug}}",
+              "--results", "{{ .Values.lseed.args.results }}" ]
           
           resources:
 {{ toYaml .Values.lseed.resources | indent 12 }}

@@ -59,19 +59,19 @@ lseed:
   tag: latest
   pullPolicy: IfNotPresent
   service:
-    lseedDNS: 53
+    lseedPort: 53
   resources: 
     requests:
       memory: 1024Mi
       cpu: 1000m
   args:
     listen: 0.0.0.0:53
-    test-lnd-node: localhost:10009
-    test-tls-path: /home/bitcoin/.lseed/tls.cert
-    test-mac-path: /home/bitcoin/.lseed/readonly.macaroon
-    root-domain: nodes.lightning.directory
-    root-ip: (pod.ip)
-    poll-interval: 10
+    testLndNode: localhost:10009
+    testTlsPath: /home/bitcoin/.lseed/tls.cert
+    testMacPath: /home/bitcoin/.lseed/readonly.macaroon
+    rootDomain: nodes.lightning.directory
+    rootIP: (pod.ip)
+    pollInterval: 10
     debug: true
     results: 25 
 

@@ -9,12 +9,12 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   ports: 
-    - name: bitcoind-p2p
+    - name: bitcoindP2p
       port: {{ .Values.bitcoind.service.p2pPort }}
-    - name: lnd-p2p
-      port: {{ .Values.bitcoind.service.p2pPort }}
-    - name: lseedDNS
-      port: {{ .Values.bitcoind.service.lseedDNS }}
+    - name: lndP2p
+      port: {{ .Values.lnd.service.p2pPort }}
+    - name: lseedPort
+      port: {{ .Values.lseed.service.lseedPort }}
   selector:
     app: {{ template "bitcoind.name" . }}
     release: {{ .Release.Name }}

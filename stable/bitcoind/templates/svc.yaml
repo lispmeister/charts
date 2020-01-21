@@ -9,11 +9,11 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   ports: 
-    - name: bitcoindP2p
+    - name: bitcoin
       port: {{ .Values.bitcoind.service.p2pPort }}
-    - name: lndP2p
+    - name: lnd
       port: {{ .Values.lnd.service.p2pPort }}
-    - name: lseedPort
+    - name: lseed
       port: {{ .Values.lseed.service.lseedPort }}
   selector:
     app: {{ template "bitcoind.name" . }}

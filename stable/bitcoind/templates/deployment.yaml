@@ -40,13 +40,13 @@ spec:
               mountPath: /home/bitcoin/.lnd/
       
       containers:
-        - name: {{ template "bitcoind.fullname" . }}
+        - name: {{ template "bitcoind.fullname" . }}-bitcoind
           image: "{{ .Values.bitcoind.repository }}:{{ .Values.bitcoind.tag }}"
           imagePullPolicy: {{ .Values.bitcoind.pullPolicy | quote }}
           resources:
 {{ toYaml .Values.bitcoind.resources | indent 12 }}
           ports:
-            - name: bitcoindP2p
+            - name: bitcoind-p2p
               containerPort: {{ .Values.bitcoind.service.p2pPort }}
           volumeMounts:
             - name: data
@@ -57,13 +57,13 @@ spec:
               subPath: bitcoin.conf
             {{- end }}
             
-        - name: {{ template "bitcoind.fullname" . }}
+        - name: {{ template "bitcoind.fullname" . }}-lnd
           image: "{{ .Values.lnd.repository }}:{{ .Values.lnd.tag }}"
           imagePullPolicy: {{ .Values.lnd.pullPolicy | quote }}
           resources:
 {{ toYaml .Values.lnd.resources | indent 12 }}
           ports:
-            - name: lndP2p
+            - name: lnd-p2p
               containerPort: {{ .Values.lnd.service.p2pPort }}
           volumeMounts:
             - name: data
@@ -74,12 +74,11 @@ spec:
               subPath: lnd.conf
             {{- end }}
 
-        - name: {{ template "bitcoind.fullname" . }}
+        - name: {{ template "bitcoind.fullname" . }}-lseed
           image: "{{ .Values.lseed.repository }}:{{ .Values.lseed.tag }}"
           imagePullPolicy: {{ .Values.lseed.pullPolicy | quote }}
           command: ["lseed"]
-          args:
-            - ["--listen", "{{ .Values.lseed.args.listen }}",
+          args: ["--listen", "{{ .Values.lseed.args.listen }}",
               "--test-lnd-node", "{{ .Values.lseed.args.testLndNode }}",
               "--test-tls-path", "{{ .Values.lseed.args.tesTtlsPath }}",
               "--test-mac-path", "{{ .Values.lseed.args.testMacPath }}",
@@ -87,12 +86,12 @@ spec:
               "--root-ip", "{{ .Values.lseed.args.rootIP }}",
               "--poll-interval", "{{ .Values.lseed.args.pollInterval }}",
               "--debug", "{{ .Values.lseed.args.debug}}",
-              "--results", "{{ .Values.lseed.args.results }}" ]
+              "--results", "{{ .Values.lseed.args.results }}"]
           
           resources:
 {{ toYaml .Values.lseed.resources | indent 12 }}
           ports:
-            - name: lseedPort
+            - name: lseed-port
               containerPort: {{ .Values.lseed.service.lseedPort }}
           volumeMounts:
             - name: data
@@ -101,14 +100,14 @@ spec:
             
       volumes:
         {{- if .Values.bitcoind.configurationFile }}
-        - name: config
+        - name: bitcoind-config
           emptyDir: {}
         - name: configmap-bitcoind
           configMap:
             name: {{ template "bitcoind.fullname" . }}-bitcoind
         {{- end }}
         {{- if .Values.lnd.configurationFile }}
-        - name: config
+        - name: lnd-config
           emptyDir: {}
         - name: configmap-lnd
           configMap:

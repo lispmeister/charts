@@ -24,25 +24,38 @@ spec:
       initContainers:
         - name: copy-bitcoind-config
           image: busybox
-          command: ['sh', '-c', 'cp /configmap/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf']
+          command: ['sh', '-c',
+            'mkdir -v /home/bitcoin/.bitcoin; mkdir -v /home/bitcoin/.lnd;
+            cp -v /configmap-bitcoind/bitcoin.conf /bitcoind-config/bitcoin.conf; 
+            cp -v /configmap-lnd/lnd.conf /lnd-config/lnd.conf;
+            echo; ls -la /home/bitcoin;
+            echo;
+            ls -la /bitcoind-config /lnd-config;
+            echo; echo "bitcoin.conf:";
+            cat /bitcoind-config/bitcoin.conf;
+            echo; echo; echo "lnd.conf:";
+            cat /lnd-config/lnd.conf']
           volumeMounts:
             - name: configmap-bitcoind
-              mountPath: /configmap
-            - name: bitcoind-config
-              mountPath: /home/bitcoin/.bitcoin/
-        - name: copy-lnd-config
-          image: busybox
-          command: ['sh', '-c', 'cp /configmap/lnd.conf /home/bitcoin/.lnd/lnd.conf']
-          volumeMounts:
+              mountPath: /configmap-bitcoind
             - name: configmap-lnd
-              mountPath: /configmap
+              mountPath: /configmap-lnd
+            - name: bitcoind-config
+              mountPath: /bitcoind-config
             - name: lnd-config
-              mountPath: /home/bitcoin/.lnd/
-      
+              mountPath: /lnd-config
+            - name: data
+              mountPath: /home/bitcoin
+
       containers:
         - name: {{ template "bitcoind.fullname" . }}-bitcoind
           image: "{{ .Values.bitcoind.repository }}:{{ .Values.bitcoind.tag }}"
           imagePullPolicy: {{ .Values.bitcoind.pullPolicy | quote }}
+          command: ['bitcoind']
+          args: [
+            '-conf=/home/bitcoin/.bitcoin/bitcoin.conf',
+            '-datadir=/home/bitcoin/.bitcoin',
+            '-printtoconsole']          
           resources:
 {{ toYaml .Values.bitcoind.resources | indent 12 }}
           ports:
@@ -51,43 +64,42 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /home/bitcoin
-            {{- if .Values.bitcoind.configurationFile }}
             - name: bitcoind-config
               mountPath: /home/bitcoin/.bitcoin/bitcoin.conf
               subPath: bitcoin.conf
-            {{- end }}
-            
+              
         - name: {{ template "bitcoind.fullname" . }}-lnd
           image: "{{ .Values.lnd.repository }}:{{ .Values.lnd.tag }}"
           imagePullPolicy: {{ .Values.lnd.pullPolicy | quote }}
+          # command: ['sh', '-c', 'cat /home/bitcoin/.lnd/lnd.conf']
+          command: ['lnd']
+          args: ['--lnddir=/home/bitcoin/.lnd', '--configfile=/home/bitcoin/.lnd/lnd.conf']
           resources:
-{{ toYaml .Values.lnd.resources | indent 12 }}
+{{ toYaml .Values.lseed.resources | indent 12 }}
           ports:
             - name: lnd-p2p
               containerPort: {{ .Values.lnd.service.p2pPort }}
           volumeMounts:
             - name: data
               mountPath: /home/bitcoin
-            {{- if .Values.lnd.configurationFile }}
             - name: lnd-config
               mountPath: /home/bitcoin/.lnd/lnd.conf
               subPath: lnd.conf
-            {{- end }}
-
+              
         - name: {{ template "bitcoind.fullname" . }}-lseed
           image: "{{ .Values.lseed.repository }}:{{ .Values.lseed.tag }}"
           imagePullPolicy: {{ .Values.lseed.pullPolicy | quote }}
-          command: ["lseed"]
-          args: ["--listen", "{{ .Values.lseed.args.listen }}",
-              "--test-lnd-node", "{{ .Values.lseed.args.testLndNode }}",
-              "--test-tls-path", "{{ .Values.lseed.args.tesTtlsPath }}",
-              "--test-mac-path", "{{ .Values.lseed.args.testMacPath }}",
-              "--root-domain", "{{ .Values.lseed.args.rootDomain }}",
-              "--root-ip", "{{ .Values.lseed.args.rootIP }}",
-              "--poll-interval", "{{ .Values.lseed.args.pollInterval }}",
-              "--debug", "{{ .Values.lseed.args.debug}}",
-              "--results", "{{ .Values.lseed.args.results }}"]
-          
+          command: ['sh', '-c', 'ls -a /home/bitcoin/.lnd']
+          # command: ["/lseed"]
+          # args: ["--listen", "{{ .Values.lseed.args.listen }}",
+          #     "--test-lnd-node", "{{ .Values.lseed.args.testLndNode }}",
+          #     "--test-tls-path", "{{ .Values.lseed.args.testTlsPath }}",
+          #     "--test-mac-path", "{{ .Values.lseed.args.testMacPath }}",
+          #     "--root-domain", "{{ .Values.lseed.args.rootDomain }}",
+          #     "--root-ip", "{{ .Values.lseed.args.rootIP }}",
+          #     "--poll-interval", "{{ .Values.lseed.args.pollInterval }}",
+          #     "--debug", "{{ .Values.lseed.args.debug}}",
+          #     "--results", "{{ .Values.lseed.args.results }}"]          
           resources:
 {{ toYaml .Values.lseed.resources | indent 12 }}
           ports:
@@ -96,6 +108,9 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /home/bitcoin
+            - name: lnd-config
+              mountPath: /home/bitcoin/.lnd/lnd.conf
+              subPath: lnd.conf
 
             
       volumes:

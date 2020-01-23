@@ -36,7 +36,7 @@ lnd:
   resources: 
     requests:
       memory: 1024Mi
-      cpu: 1000m
+      cpu: 500m
   configurationFile:
     lnd.conf: |-
       listen=0.0.0.0:9735
@@ -63,14 +63,14 @@ lseed:
   resources: 
     requests:
       memory: 1024Mi
-      cpu: 1000m
+      cpu: 500m
   args:
     listen: 0.0.0.0:53
-    testLndNode: localhost:10009
-    testTlsPath: /home/bitcoin/.lseed/tls.cert
-    testMacPath: /home/bitcoin/.lseed/readonly.macaroon
+    testLndNode: 127.0.0.1:10009
+    testTlsPath: /root/.lnd/tls.cert
+    testMacPath: /root/.lnd/data/chain/bitcoin/testnet/readonly.macaroon
     rootDomain: nodes.lightning.directory
-    rootIP: (pod.ip)
+    rootIP: 127.0.0.1  # temporary, needs to retrieve LB IP via DNS
     pollInterval: 10
     debug: true
     results: 25 
@@ -78,6 +78,7 @@ lseed:
   
 persistence:
   enabled: true
+  # enabled: false
   ## database data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning

@@ -67,8 +67,8 @@ lseed:
   args:
     listen: 0.0.0.0:53
     testLndNode: 127.0.0.1:10009
-    testTlsPath: /root/.lnd/tls.cert
-    testMacPath: /root/.lnd/data/chain/bitcoin/testnet/readonly.macaroon
+    testTlsPath: /home/bitcoin/.lnd/tls.cert
+    testMacPath: /home/bitcoin/.lnd/data/chain/bitcoin/testnet/readonly.macaroon
     rootDomain: nodes.lightning.directory
     rootIP: 127.0.0.1  # temporary, needs to retrieve LB IP via DNS
     pollInterval: 10

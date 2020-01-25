@@ -10,13 +10,12 @@ bitcoind:
     p2pPort: 18333
     resources: 
   requests:
-    memory: 1024Mi
+    memory: 2Gi
     cpu: 1000m
   configurationFile:
     bitcoin.conf: |-
       testnet=1
       server=1
-      printtoconsole=1
       txindex=1
       disablewallet=1
       [test]
@@ -35,7 +34,7 @@ lnd:
     p2pPort: 9735
   resources: 
     requests:
-      memory: 1024Mi
+      memory: 1Gi
       cpu: 500m
   configurationFile:
     lnd.conf: |-
@@ -62,13 +61,13 @@ lseed:
     lseedPort: 53
   resources: 
     requests:
-      memory: 1024Mi
+      memory: 500Mi
       cpu: 500m
   args:
     listen: 0.0.0.0:53
     testLndNode: 127.0.0.1:10009
-    testTlsPath: /home/bitcoin/.lnd/tls.cert
-    testMacPath: /home/bitcoin/.lnd/data/chain/bitcoin/testnet/readonly.macaroon
+    testTlsPath: /data/lnd/tls.cert
+    testMacPath: /data/lnd/data/chain/bitcoin/testnet/readonly.macaroon
     rootDomain: nodes.lightning.directory
     rootIP: 127.0.0.1  # temporary, needs to retrieve LB IP via DNS
     pollInterval: 10

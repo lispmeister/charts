@@ -25,10 +25,10 @@ spec:
         - name: copy-bitcoind-config
           image: busybox
           command: ['sh', '-c',
-            'mkdir -v /home/bitcoin/.bitcoin; mkdir -v /home/bitcoin/.lnd;
+            'mkdir -v /data/bitcoin; mkdir -v /data/lnd;
             cp -v /configmap-bitcoind/bitcoin.conf /bitcoind-config/bitcoin.conf; 
             cp -v /configmap-lnd/lnd.conf /lnd-config/lnd.conf;
-            echo; ls -la /home/bitcoin;
+            echo; ls -la /data;
             echo;
             ls -la /bitcoind-config /lnd-config;
             echo; echo "bitcoin.conf:";
@@ -45,7 +45,7 @@ spec:
             - name: lnd-config
               mountPath: /lnd-config
             - name: data
-              mountPath: /home/bitcoin
+              mountPath: /data
 
       containers:
         - name: {{ template "bitcoind.fullname" . }}-bitcoind
@@ -53,9 +53,9 @@ spec:
           imagePullPolicy: {{ .Values.bitcoind.pullPolicy | quote }}
           command: ['bitcoind']
           args: [
-            '-conf=/home/bitcoin/.bitcoin/bitcoin.conf',
-            '-datadir=/home/bitcoin/.bitcoin',
-            '-printtoconsole']          
+            '-printtoconsole',
+            '-conf=/bitcoind-config/bitcoin.conf',
+            '-datadir=/data/bitcoin']          
           resources:
 {{ toYaml .Values.bitcoind.resources | indent 12 }}
           ports:
@@ -63,17 +63,17 @@ spec:
               containerPort: {{ .Values.bitcoind.service.p2pPort }}
           volumeMounts:
             - name: data
-              mountPath: /home/bitcoin
+              mountPath: /data
             - name: bitcoind-config
-              mountPath: /home/bitcoin/.bitcoin/bitcoin.conf
+              mountPath: /bitcoind-config/bitcoin.conf
               subPath: bitcoin.conf
               
         - name: {{ template "bitcoind.fullname" . }}-lnd
           image: "{{ .Values.lnd.repository }}:{{ .Values.lnd.tag }}"
           imagePullPolicy: {{ .Values.lnd.pullPolicy | quote }}
-          # command: ['sh', '-c', 'cat /home/bitcoin/.lnd/lnd.conf']
+          # command: ['sh', '-c', 'cat /lnd-config/lnd.conf']
           command: ['lnd']
-          args: ['--lnddir=/home/bitcoin/.lnd', '--configfile=/home/bitcoin/.lnd/lnd.conf']
+          args: ['--lnddir=/data/lnd', '--configfile=/lnd-config/lnd.conf']
           resources:
 {{ toYaml .Values.lseed.resources | indent 12 }}
           ports:
@@ -81,9 +81,9 @@ spec:
               containerPort: {{ .Values.lnd.service.p2pPort }}
           volumeMounts:
             - name: data
-              mountPath: /home/bitcoin
+              mountPath: /data
             - name: lnd-config
-              mountPath: /home/bitcoin/.lnd/lnd.conf
+              mountPath: /lnd-config/lnd.conf
               subPath: lnd.conf
               
         - name: {{ template "bitcoind.fullname" . }}-lseed
@@ -107,10 +107,7 @@ spec:
               containerPort: {{ .Values.lseed.service.lseedPort }}
           volumeMounts:
             - name: data
-              mountPath: /home/bitcoin
-            - name: lnd-config
-              mountPath: /home/bitcoin/.lnd/lnd.conf
-              subPath: lnd.conf
+              mountPath: /data
           env:
             - name: MY_POD_IP
               valueFrom:

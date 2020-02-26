@@ -87,7 +87,8 @@ persistence:
   ##
   # storageClass: "-"
   accessMode: ReadWriteOnce
-  size: 300Gi
+  size: 50Gi # enough for testnet
+#  size: 300Gi # mainnet
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/

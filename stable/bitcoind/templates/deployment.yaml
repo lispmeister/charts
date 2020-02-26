@@ -109,7 +109,7 @@ spec:
             - name: data
               mountPath: /data
           env:
-            - name: MY_POD_IP
+            - name: MY_POD_IP # this needs to be our static external IP address
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
